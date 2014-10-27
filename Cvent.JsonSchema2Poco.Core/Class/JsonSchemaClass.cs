@@ -37,7 +37,7 @@ namespace Cvent.JsonSchema2Poco.Class
             return classBuilder.Build(schema, schemaName, schemaNamespace);
         }
 
-        public CodeCompileUnit GetClassRepresentation()
+        public CodeCompileUnit GetClassRepresentation(bool usePartialClasses)
         {
             // DEFINE THE CONSTRUCTOR.
             var constructor = new CodeConstructor();
@@ -47,6 +47,7 @@ namespace Cvent.JsonSchema2Poco.Class
             // DEFINE THE IN MEMORY CLASS REPRESENTATION OF THE SCHEMA.
             var jsonClassRepresentation = new CodeTypeDeclaration();
             jsonClassRepresentation.IsClass = true;
+            jsonClassRepresentation.IsPartial = usePartialClasses;
             jsonClassRepresentation.Name = Name;
             jsonClassRepresentation.Comments.Add(new CodeCommentStatement(Comment));
             Fields.ForEach(x => jsonClassRepresentation.Members.Add(x));

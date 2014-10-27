@@ -35,6 +35,18 @@ namespace Cvent.JsonSchema2Poco.Schema
         private static JsonSchema Parse(Uri schemaUri, JsonSchemaResolver referenceSchemaResolver)
         {
             var schemaContent = GetJsonFromResource(schemaUri);
+            // RESOLVE THE ID OF THE SCHEMA TO AN ABSOLUTE URI.
+            var id = GetProperty(schemaContent, "id", JTokenType.String);
+            if (id != null)
+            {
+                var resolvedUri = new Uri(schemaUri, new Uri(id.Value<string>(), UriKind.RelativeOrAbsolute));
+                schemaContent["id"].Replace(JToken.Parse(string.Format(@"""{0}""", resolvedUri)));
+            }
+            else
+            {
+                // The Id was not present. Simply resolve as the URI of the parent schema.
+                schemaContent.Add("id", JToken.Parse(string.Format(@"""{0}""", schemaUri)));
+            }
             ResolveReferenceSchemas(schemaContent, schemaUri, referenceSchemaResolver);
             return JsonSchema.Parse(schemaContent.ToString(), referenceSchemaResolver);
         }

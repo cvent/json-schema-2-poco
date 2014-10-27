@@ -8,6 +8,9 @@ namespace Cvent.JsonSchema2Poco
         HashSet<Uri> Sources { get; }
         string TargetDirectory { get; }
         string Namespace { get; }
+        bool UseLongsForInts { get; }
+        bool UseDoublesForFloats { get; }
+        bool UsePartialClasses { get; }
         bool RemoveOldOutput { get; }
     }
 }

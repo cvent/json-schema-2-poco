@@ -16,6 +16,9 @@ namespace Cvent.JsonSchema2Poco
         public HashSet<Uri> Sources { get; private set; }
         public string TargetDirectory { get; private set; }
         public string Namespace { get; private set; }
+        public bool UsePartialClasses { get; private set; }
+        public bool UseLongsForInts { get; private set; }
+        public bool UseDoublesForFloats { get; private set; }
         public bool RemoveOldOutput { get; private set; }
 
         public CommandLineSettings()
@@ -36,6 +39,18 @@ namespace Cvent.JsonSchema2Poco
                 {"n=|namespace=", "Namespace containing all of the generated classes", ns => settings.Namespace = ns},
                 {"s=|schemas=", "File path to the schema file", s => sources = s},
                 {"o=|output=", "Directory to save files", fn => settings.TargetDirectory = fn},
+                {
+                    "l|long", "Indicates if longs should be used instead of ints for integers.",
+                    fn => settings.UseLongsForInts = fn != null
+                },
+                {
+                    "f|floats", "Indicates if doubles should be used instead of floats for numbers.",
+                    fn => settings.UseDoublesForFloats = fn != null
+                },
+                {
+                    "p|partial", "Flag to set if the classes generated will be partial.",
+                    fn => settings.UsePartialClasses = fn != null
+                },
                 {
                     "r|remove", "Flag to remove files in output directory before generation.",
                     fn => settings.RemoveOldOutput = fn != null

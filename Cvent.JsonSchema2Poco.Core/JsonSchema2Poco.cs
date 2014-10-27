@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Cvent.JsonSchema2Poco.Class.Property.Types;
 using Cvent.JsonSchema2Poco.Schema;
 using Cvent.JsonSchema2Poco.Class;
 using Microsoft.CSharp;
@@ -31,6 +32,9 @@ namespace Cvent.JsonSchema2Poco
             var schemas = new List<JsonSchema>();
             configuration.Sources.ToList().ForEach(schemaUri => schemas.Add(JsonSchemaParser.Parse(schemaUri)));
 
+            // SET PROPERTY CONFIGS.
+            SetPropertyConfigs(configuration);
+
             // CREATE THE CLASS REPRESENTATION OF THE SCHEMAS.
             var schemaClassRepresentations = new List<JsonSchemaClass>();
             schemas.ForEach(schema => schemaClassRepresentations.Add(JsonSchemaClass.CreateFromSchema(schema, null, configuration.Namespace)));
@@ -39,8 +43,14 @@ namespace Cvent.JsonSchema2Poco
             // GENERATE THE CLASSES.
             foreach (var schemaClass in uniqueSchemas)
             {
-                File.WriteAllText(Path.Combine(configuration.TargetDirectory, schemaClass.Name + ".cs"), GetCSharpClassText(schemaClass.GetClassRepresentation()));
+                File.WriteAllText(Path.Combine(configuration.TargetDirectory, schemaClass.Name + ".cs"), GetCSharpClassText(schemaClass.GetClassRepresentation(configuration.UsePartialClasses)));
             }
+        }
+
+        private static void SetPropertyConfigs(IGenerationConfig configuration)
+        {
+            IntegerPropertyType.UseLongs = configuration.UseLongsForInts;
+            NumberPropertyType.UseDoubles = configuration.UseDoublesForFloats;
         }
 
         private static string GetCSharpClassText(CodeCompileUnit classRepresentation)

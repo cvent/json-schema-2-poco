@@ -15,6 +15,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+nuget/tools/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
