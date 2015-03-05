@@ -85,12 +85,35 @@ namespace Cvent.SchemaToPoco.Core
         }
 
         /// <summary>
-        ///     Load all the schemas from a file.
+        ///     Load all the schemas from a file (or directory).
         /// </summary>
         private void LoadSchemas()
         {
             var resolver = new JsonSchemaResolver(_configuration.Namespace, !_configuration.Verbose, _configuration.OutputDirectory);
-            _schemas = resolver.ResolveSchemas(_configuration.JsonSchemaFileLocation);
+            FileAttributes attr = File.GetAttributes(_configuration.JsonSchemaFileLocation);
+
+            // if specified path is a directory, load schemas from each file, otherwise just load schemas from that path
+            bool isDirectory = (attr & FileAttributes.Directory) > 0;
+            if (isDirectory)
+            {
+                _schemas = new Dictionary<Uri, JsonSchemaWrapper>();
+                foreach (String fileName in Directory.GetFiles(_configuration.JsonSchemaFileLocation))
+                {
+                    Dictionary<Uri, JsonSchemaWrapper> resolvedSchemas = resolver.ResolveSchemas(fileName);
+                    foreach (Uri key in resolvedSchemas.Keys)
+                    {
+                        // Schemas may refer to eachother, don't add the same schema twice just because it was included by reference
+                        if (!_schemas.ContainsKey(key))
+                        {
+                            _schemas.Add(key,resolvedSchemas[key]);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                _schemas = resolver.ResolveSchemas(_configuration.JsonSchemaFileLocation);
+            }
         }
 
         /// <summary>
