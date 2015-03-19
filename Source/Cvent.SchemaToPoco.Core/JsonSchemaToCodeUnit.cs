@@ -102,6 +102,7 @@ namespace Cvent.SchemaToPoco.Core
                         schema.Description = Regex.Unescape(schema.Description);
                     }
 
+                    Type type;
                     // If it is an enum
                     if (schema.Enum != null)
                     {
@@ -122,64 +123,68 @@ namespace Cvent.SchemaToPoco.Core
 
                         // Add to namespace
                         nsWrap.AddClass(enumWrap.Property);
+
+                        // note type for property declaration
+                        type = new TypeBuilderHelper(_codeNamespace).GetCustomType(name, true);
                     }
                     else
                     {
                         // WARNING: This assumes the namespace of the property is the same as the parent.
                         // This should not be a problem since imports are handled for all dependencies at the beginning.
-                        Type type = JsonSchemaUtils.GetType(schema, _codeNamespace);
-                        bool isCustomType = type.Namespace != null && type.Namespace.Equals(_codeNamespace);
-                        string strType = String.Empty;
-
-                        // Add imports
-                        nsWrap.AddImport(type.Namespace);
-                        nsWrap.AddImportsFromSchema(schema);
-
-                        // Get the property type
-                        if (isCustomType)
-                        {
-                            strType = JsonSchemaUtils.IsArray(schema) ? string.Format("{0}<{1}>", JsonSchemaUtils.GetArrayType(schema), type.Name) : type.Name;
-                        }
-                        else if (JsonSchemaUtils.IsArray(schema))
-                        {
-                            strType = string.Format("{0}<{1}>", JsonSchemaUtils.GetArrayType(schema),
-                                new CSharpCodeProvider().GetTypeOutput(new CodeTypeReference(type)));
-                        }
-
-                        var field = new CodeMemberField
-                        {
-                            Attributes = MemberAttributes.Private,
-                            Name = "_" + i.Key,
-                            Type =
-                                TypeUtils.IsPrimitive(type) && !JsonSchemaUtils.IsArray(schema)
-                                    ? new CodeTypeReference(type)
-                                    : new CodeTypeReference(strType)
-                        };
-
-                        // Add comment if not null
-                        if (!String.IsNullOrEmpty(schema.Description))
-                        {
-                            field.Comments.Add(new CodeCommentStatement(schema.Description));
-                        }
-
-                        clWrap.Property.Members.Add(field);
-
-                        // Add setters/getters
-                        CodeMemberProperty property = CreateProperty("_" + i.Key,
-                            i.Key.Capitalize(), field.Type.BaseType);
-                        var prWrap = new PropertyWrapper(property);
-
-                        // Add comments and attributes
-                        prWrap.Populate(schema, _attributeType);
-
-                        // Add default, if any
-                        if (schema.Default != null)
-                        {
-                            clWrap.AddDefault(field.Name, field.Type, schema.Default.ToString());
-                        }
-
-                        clWrap.Property.Members.Add(property);
+                        type = JsonSchemaUtils.GetType(schema, _codeNamespace);
                     }
+
+                    bool isCustomType = type.Namespace != null && type.Namespace.Equals(_codeNamespace);
+                    string strType = String.Empty;
+
+                    // Add imports
+                    nsWrap.AddImport(type.Namespace);
+                    nsWrap.AddImportsFromSchema(schema);
+
+                    // Get the property type
+                    if (isCustomType)
+                    {
+                        strType = JsonSchemaUtils.IsArray(schema) ? string.Format("{0}<{1}>", JsonSchemaUtils.GetArrayType(schema), type.Name) : type.Name;
+                    }
+                    else if (JsonSchemaUtils.IsArray(schema))
+                    {
+                        strType = string.Format("{0}<{1}>", JsonSchemaUtils.GetArrayType(schema),
+                            new CSharpCodeProvider().GetTypeOutput(new CodeTypeReference(type)));
+                    }
+
+                    var field = new CodeMemberField
+                    {
+                        Attributes = MemberAttributes.Private,
+                        Name = "_" + i.Key,
+                        Type =
+                            TypeUtils.IsPrimitive(type) && !JsonSchemaUtils.IsArray(schema)
+                                ? new CodeTypeReference(type)
+                                : new CodeTypeReference(strType)
+                    };
+
+                    // Add comment if not null
+                    if (!String.IsNullOrEmpty(schema.Description))
+                    {
+                        field.Comments.Add(new CodeCommentStatement(schema.Description));
+                    }
+
+                    clWrap.Property.Members.Add(field);
+
+                    // Add setters/getters
+                    CodeMemberProperty property = CreateProperty("_" + i.Key,
+                        i.Key.Capitalize(), field.Type.BaseType);
+                    var prWrap = new PropertyWrapper(property);
+
+                    // Add comments and attributes
+                    prWrap.Populate(schema, _attributeType);
+
+                    // Add default, if any
+                    if (schema.Default != null)
+                    {
+                        clWrap.AddDefault(field.Name, field.Type, schema);
+                    }
+
+                    clWrap.Property.Members.Add(property);
                 }
             }
 
