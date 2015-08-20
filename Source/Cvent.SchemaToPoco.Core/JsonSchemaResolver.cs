@@ -71,7 +71,10 @@ namespace Cvent.SchemaToPoco.Core
             
             // Resolve the root schema
             JsonSchemaWrapper schema = ResolveSchemaHelper(uri, uri);
-            _schemas.Add(uri, schema);
+            if (!_schemas.ContainsKey(uri))
+            {
+                _schemas.Add(uri, schema);
+            }
             return _schemas;
         }
 

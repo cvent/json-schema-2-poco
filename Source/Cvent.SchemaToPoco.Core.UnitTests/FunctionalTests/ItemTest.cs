@@ -27,19 +27,7 @@ namespace Cvent.SchemaToPoco.Core.UnitTests.FunctionalTests
     public class DefaultClassName
     {
 
-        private List<string> _foo;
-
-        public virtual List<string> Foo
-        {
-            get
-            {
-                return _foo;
-            }
-            set
-            {
-                _foo = value;
-            }
-        }
+        public List<string> Foo { get; set; }
     }
 }";
 

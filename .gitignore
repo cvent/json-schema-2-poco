@@ -177,3 +177,5 @@ FakesAssemblies/
 
 Source/Schema*
 generated/*
+*.ncrunchproject
+*.ncrunchsolution

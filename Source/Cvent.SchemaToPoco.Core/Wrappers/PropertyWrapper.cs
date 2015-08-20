@@ -10,9 +10,9 @@ namespace Cvent.SchemaToPoco.Core.Wrappers
     /// <summary>
     ///     Wrapper for an automatic property.
     /// </summary>
-    internal class PropertyWrapper : BaseWrapper<CodeMemberProperty>
+    internal class PropertyWrapper : BaseWrapper<CodeMemberField>
     {
-        public PropertyWrapper(CodeMemberProperty p) : base(p)
+        public PropertyWrapper(CodeMemberField p) : base(p)
         {
         }
 

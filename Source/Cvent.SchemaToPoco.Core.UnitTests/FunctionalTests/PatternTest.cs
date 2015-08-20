@@ -28,21 +28,8 @@ namespace Cvent.SchemaToPoco.Core.UnitTests.FunctionalTests
     {
 
         // Match the regex ""dev""'[a-c]
-        private string _foo;
-
-        // Match the regex ""dev""'[a-c]
         [RegularExpression(@""^\\\""""dev\""""\'[a-c]\s$"")]
-        public virtual string Foo
-        {
-            get
-            {
-                return _foo;
-            }
-            set
-            {
-                _foo = value;
-            }
-        }
+        public string Foo { get; set; }
     }
 }";
 

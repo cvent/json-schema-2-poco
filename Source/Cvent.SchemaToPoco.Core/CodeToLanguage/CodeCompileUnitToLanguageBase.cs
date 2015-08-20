@@ -47,7 +47,7 @@ namespace Cvent.SchemaToPoco.Core.CodeToLanguage
                 BracingStyle = "C"
             });
 
-            string output = stringBuilder.ToString();
+            string output = stringBuilder.ToString().Replace(" { get; set; };\r\n", " { get; set; }\r\n");
             return output;
         }
     }

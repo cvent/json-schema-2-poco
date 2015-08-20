@@ -39,59 +39,20 @@ namespace generated
     using System.Collections.Generic;
     using Cvent.SchemaToPoco.Core.ValidationAttributes;
     using System.ComponentModel.DataAnnotations;
-    
+
     // A nation with its own government, occupying a particular territory
     public class Country
     {
         // Used as the symbol or emblem of a country
-        private Flag _flag;
-        
+        public Flag Flag { get; set; }
+
         // A large town
-        private HashSet<City> _cities;
-        
-        // The number of people inhabiting this country
-        private int _population;
-        
-        // Used as the symbol or emblem of a country
-        public virtual Flag Flag
-        {
-            get
-            {
-                return _flag;
-            }
-            set
-            {
-                _flag = value;
-            }
-        }
-        
-        // A large town
-        public virtual HashSet<City> Cities
-        {
-            get
-            {
-                return _cities;
-            }
-            set
-            {
-                _cities = value;
-            }
-        }
-        
+        public HashSet<City> Cities { get; set; }
+
         // The number of people inhabiting this country
         [Required()]
         [MinValue(1000)]
-        public virtual int Population
-        {
-            get
-            {
-                return _population;
-            }
-            set
-            {
-                _population = value;
-            }
-        }
+        public int Population { get; set; }
     }
 }
 ```
