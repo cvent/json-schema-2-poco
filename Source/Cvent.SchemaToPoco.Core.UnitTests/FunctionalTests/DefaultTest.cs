@@ -24,43 +24,19 @@ namespace Cvent.SchemaToPoco.Core.UnitTests.FunctionalTests
             const string correctResult = @"namespace generated
 {
     using System;
-
-
+    
+    
     public class DefaultClassName
     {
-
-        private string _foo;
-
-        private int _number;
-
+        
+        public string Foo { get; set; }
+        
+        public int Number { get; set; }
+        
         public DefaultClassName()
         {
-            _foo = ""hello"";
-            _number = 10;
-        }
-
-        public virtual string Foo
-        {
-            get
-            {
-                return _foo;
-            }
-            set
-            {
-                _foo = value;
-            }
-        }
-
-        public virtual int Number
-        {
-            get
-            {
-                return _number;
-            }
-            set
-            {
-                _number = value;
-            }
+            Foo = ""hello"";
+            Number = 10;
         }
     }
 }";

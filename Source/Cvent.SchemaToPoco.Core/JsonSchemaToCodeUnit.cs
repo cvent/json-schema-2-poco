@@ -103,11 +103,12 @@ namespace Cvent.SchemaToPoco.Core
                     }
 
                     Type type;
+                    string propertyName = i.Key.Capitalize();
+
                     // If it is an enum
                     if (schema.Enum != null)
                     {
-                        string name = i.Key.Capitalize();
-                        var enumField = new CodeTypeDeclaration(name);
+                        var enumField = new CodeTypeDeclaration(propertyName);
                         var enumWrap = new EnumWrapper(enumField);
 
                         // Add comment if not null
@@ -125,7 +126,7 @@ namespace Cvent.SchemaToPoco.Core
                         nsWrap.AddClass(enumWrap.Property);
 
                         // note type for property declaration
-                        type = new TypeBuilderHelper(_codeNamespace).GetCustomType(name, true);
+                        type = new TypeBuilderHelper(_codeNamespace).GetCustomType(propertyName, true);
                     }
                     else
                     {
@@ -151,28 +152,11 @@ namespace Cvent.SchemaToPoco.Core
                         strType = string.Format("{0}<{1}>", JsonSchemaUtils.GetArrayType(schema),
                             new CSharpCodeProvider().GetTypeOutput(new CodeTypeReference(type)));
                     }
+                    
+                    var property = CreateProperty(propertyName, TypeUtils.IsPrimitive(type) && !JsonSchemaUtils.IsArray(schema)
+                                    ? new CodeTypeReference(type)
+                                    : new CodeTypeReference(strType));
 
-                    var field = new CodeMemberField
-                    {
-                        Attributes = MemberAttributes.Private,
-                        Name = "_" + i.Key,
-                        Type =
-                            TypeUtils.IsPrimitive(type) && !JsonSchemaUtils.IsArray(schema)
-                                ? new CodeTypeReference(type)
-                                : new CodeTypeReference(strType)
-                    };
-
-                    // Add comment if not null
-                    if (!String.IsNullOrEmpty(schema.Description))
-                    {
-                        field.Comments.Add(new CodeCommentStatement(schema.Description));
-                    }
-
-                    clWrap.Property.Members.Add(field);
-
-                    // Add setters/getters
-                    CodeMemberProperty property = CreateProperty("_" + i.Key,
-                        i.Key.Capitalize(), field.Type.BaseType);
                     var prWrap = new PropertyWrapper(property);
 
                     // Add comments and attributes
@@ -181,7 +165,7 @@ namespace Cvent.SchemaToPoco.Core
                     // Add default, if any
                     if (schema.Default != null)
                     {
-                        clWrap.AddDefault(field.Name, field.Type, schema);
+                        clWrap.AddDefault(propertyName, property.Type, schema);
                     }
 
                     clWrap.Property.Members.Add(property);
@@ -196,32 +180,26 @@ namespace Cvent.SchemaToPoco.Core
         }
 
         /// <summary>
-        ///     Creates a public property with getters and setters that wrap the
+        ///     Creates a public auto property with getters and setters that wrap the
         ///     specified field.
         /// </summary>
         /// <param name="field">The field to get and set.</param>
         /// <param name="name">The name of the property.</param>
         /// <param name="type">The type of the property.</param>
         /// <returns>The property.</returns>
-        public static CodeMemberProperty CreateProperty(string field, string name, string type)
+        public static CodeMemberField CreateProperty(string name, CodeTypeReference type)
         {
-            var property = new CodeMemberProperty
+            var field = new CodeMemberField
             {
                 Name = name,
-                Type = new CodeTypeReference(type),
-                Attributes = MemberAttributes.Public
+                Type = type,
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                
             };
 
-            property.SetStatements.Add(
-                new CodeAssignStatement(
-                    new CodeFieldReferenceExpression(null, field),
-                    new CodePropertySetValueReferenceExpression()));
+            field.Name += " { get; set; }";
 
-            property.GetStatements.Add(
-                new CodeMethodReturnStatement(
-                    new CodeFieldReferenceExpression(null, field)));
-
-            return property;
+            return field;
         }
     }
 }

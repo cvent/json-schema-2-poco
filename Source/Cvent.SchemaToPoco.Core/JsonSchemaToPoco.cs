@@ -105,7 +105,7 @@ namespace Cvent.SchemaToPoco.Core
                         // Schemas may refer to eachother, don't add the same schema twice just because it was included by reference
                         if (!_schemas.ContainsKey(key))
                         {
-                            _schemas.Add(key,resolvedSchemas[key]);
+                            _schemas.Add(key, resolvedSchemas[key]);
                         }
                     }
                 }
@@ -133,8 +133,7 @@ namespace Cvent.SchemaToPoco.Core
             {
                 if (!_configuration.Verbose)
                 {
-                    string saveLoc = _configuration.OutputDirectory + Path.DirectorySeparatorChar + entry.Key.Namespace.Replace('.', Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar + entry.Key.Schema.Title +
-                                     ".cs";
+                    string saveLoc = Path.Combine(_configuration.OutputDirectory, entry.Key.Namespace.Replace('.', Path.DirectorySeparatorChar), entry.Key.Schema.Title + ".cs");
                     IoUtils.GenerateFile(entry.Value, saveLoc);
                     Console.WriteLine("Wrote " + saveLoc);
                 }

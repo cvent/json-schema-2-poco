@@ -29,20 +29,7 @@ namespace Cvent.SchemaToPoco.Core.UnitTests.FunctionalTests
     {
 
         // Description for foo!
-        private string _foo;
-
-        // Description for foo!
-        public virtual string Foo
-        {
-            get
-            {
-                return _foo;
-            }
-            set
-            {
-                _foo = value;
-            }
-        }
+        public string Foo { get; set; }
     }
 }";
 
