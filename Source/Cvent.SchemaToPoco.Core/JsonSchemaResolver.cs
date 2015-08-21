@@ -110,11 +110,16 @@ namespace Cvent.SchemaToPoco.Core
             var deserialized = JsonConvert.DeserializeAnonymousType(data, definition);
             var dependencies = new List<JsonSchemaWrapper>();
 
-            MatchCollection matches = Regex.Matches(data, @"\""\$ref\""\s*:\s*\""(.*.json)\""");
+            MatchCollection matches = Regex.Matches(data, @"\""\$ref\""\s*:\s*\""(.*)\""");
             foreach (Match match in matches)
             {
                 // Get the full path to the file, and change the reference to match
-                var currPath = new Uri(match.Groups[1].Value, UriKind.RelativeOrAbsolute);
+                string refName = match.Groups[1].Value;
+                if (!refName.EndsWith(".json"))
+                {
+                    refName += ".json";
+                }
+                var currPath = new Uri(refName, UriKind.RelativeOrAbsolute);
                 var currUri = IoUtils.GetAbsoluteUri(parent, currPath, true);
 
                 JsonSchemaWrapper schema;
@@ -230,7 +235,7 @@ namespace Cvent.SchemaToPoco.Core
         private string StandardizeReferences(Uri parentUri, string data)
         {
             var lines = new List<string>(data.Split('\n'));
-            var pattern = new Regex(@"(\""\$ref\""\s*:\s*\"")(.*.json)(\"")");
+            var pattern = new Regex(@"(\""\$ref\""\s*:\s*\"")(.*)(\"")");
 
             for (int i = lines.Count - 1; i >= 0; i--)
             {
@@ -238,6 +243,10 @@ namespace Cvent.SchemaToPoco.Core
                 {
                     var matched = pattern.Match(lines[i]);
                     var matchedPath = matched.Groups[2].Value;
+                    if (!matchedPath.EndsWith(".json"))
+                    {
+                        matchedPath += ".json";
+                    }
                     var absPath = IoUtils.GetAbsoluteUri(parentUri, new Uri(matchedPath, UriKind.RelativeOrAbsolute), true);
                     lines[i] = matched.Groups[1].Value + absPath + matched.Groups[3].Value + ",";
                 }
