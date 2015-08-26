@@ -197,7 +197,7 @@ namespace Cvent.SchemaToPoco.Core
                 
             };
 
-            field.Name += " { get; set; }";
+            field.Name += " { get; set; } //";
 
             return field;
         }
