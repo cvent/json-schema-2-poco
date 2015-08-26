@@ -245,7 +245,7 @@ namespace Cvent.SchemaToPoco.Core
         private string StandardizeReferences(Uri parentUri, string data, ICollection<string> ids)
         {
             var lines = new List<string>(data.Split('\n'));
-            var pattern = new Regex(@"(\""\$ref\""\s*:\s*\"")(.*)(\"")");
+            var pattern = new Regex(@"(""\$ref""\s*:\s*"")(.*)("")");
 
             for (int i = lines.Count - 1; i >= 0; i--)
             {
@@ -277,7 +277,7 @@ namespace Cvent.SchemaToPoco.Core
         {
             var ids = new List<string>();
             var lines = new List<string>(data.Split('\n'));
-            var idPattern = new Regex(@"(\""id\""\s*:\s*\"")(.*)(\"")");
+            var idPattern = new Regex(@"(""id""\s*:\s*"")(.*)(\"")");
             for (int i = lines.Count - 1; i >= 0; i--)
             {
                 if (idPattern.IsMatch(lines[i]))
