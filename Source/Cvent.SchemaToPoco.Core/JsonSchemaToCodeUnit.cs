@@ -197,6 +197,10 @@ namespace Cvent.SchemaToPoco.Core
                 
             };
 
+            // adding the autoprop declaration to the field name is a workaround as autoprops
+            // are otherwise unsupported by CodeMemberField. Unfortunately, this adds an
+            // extraneous ; at the end of the line, so the // hides that from the compiler
+            // and crucially hides it from CS2J
             field.Name += " { get; set; } //";
 
             return field;
