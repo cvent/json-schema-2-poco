@@ -182,6 +182,7 @@ namespace Cvent.SchemaToPoco.Core
             // Set up schema and wrapper to return
             JsonSchema parsed;
 
+            RemoveDuplicateSchemas();
             try
             {
                 parsed = JsonSchema.Parse(data, _resolver);
@@ -233,6 +234,39 @@ namespace Cvent.SchemaToPoco.Core
             }
 
             return toReturn;
+        }
+
+        /// <summary>
+        /// We avoid adding duplicate schema IDs to the list to be parsed, but if we first parse the schema itself
+        /// and then parse another schema that refers to it, then somewhere in the NewtonSoft parsing code we wind
+        /// up adding a second copy of the referenced schema to _resolver.LoadedSchemas
+        /// Then when the resolver attempts to follow the reference, it throws an error because it has
+        /// two copies of the schema. Since they are identical we can get around this by just removing the
+        /// extra copy.
+        /// </summary>
+        private void RemoveDuplicateSchemas()
+        {
+            ICollection<JsonSchema> dups = new HashSet<JsonSchema>();
+            ICollection<String> schemaIds = new HashSet<String>();
+
+            foreach (JsonSchema schema in _resolver.LoadedSchemas)
+            {
+                if (schema.Id != null)
+                {
+                    if (schemaIds.Contains(schema.Id))
+                    {
+                        dups.Add(schema);
+                    }
+                    else
+                    {
+                        schemaIds.Add(schema.Id);
+                    }
+                }
+            }
+            foreach (JsonSchema dup in dups)
+            {
+                _resolver.LoadedSchemas.Remove(dup);
+            }
         }
 
         /// <summary>
