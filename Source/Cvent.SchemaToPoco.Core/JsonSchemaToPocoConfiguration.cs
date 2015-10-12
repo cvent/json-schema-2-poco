@@ -17,6 +17,7 @@ namespace Cvent.SchemaToPoco.Core
             OutputDirectory = Directory.GetCurrentDirectory();
             Verbose = false;
             AttributeType = AttributeType.SystemDefault;
+            GenerateNamespaceDirectories = true;
         }
 
         /// <summary>
@@ -43,5 +44,10 @@ namespace Cvent.SchemaToPoco.Core
         ///     Type of validation attribute to use.
         /// </summary>
         public AttributeType AttributeType { get; set; }
+
+        /// <summary>
+        ///     Generate directories for namespace parts
+        /// </summary>
+        public bool GenerateNamespaceDirectories { get; set; }
     }
 }
