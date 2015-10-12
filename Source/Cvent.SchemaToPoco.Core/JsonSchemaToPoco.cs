@@ -51,6 +51,12 @@ namespace Cvent.SchemaToPoco.Core
             {
                 ConfigureLogging();
 
+                //Base output directory is always needed regardless of namespace directories generation option
+                if (!Directory.Exists(_configuration.OutputDirectory))
+                {
+                    Directory.CreateDirectory(_configuration.OutputDirectory);
+                }
+
                 // Load schemas given a json file or directory
                 LoadSchemas();
 
@@ -89,7 +95,7 @@ namespace Cvent.SchemaToPoco.Core
         /// </summary>
         private void LoadSchemas()
         {
-            var resolver = new JsonSchemaResolver(_configuration.Namespace, !_configuration.Verbose, _configuration.OutputDirectory);
+            var resolver = new JsonSchemaResolver(_configuration.Namespace, !_configuration.Verbose && _configuration.GenerateNamespaceDirectories, _configuration.OutputDirectory);
             FileAttributes attr = File.GetAttributes(_configuration.JsonSchemaFileLocation);
 
             // if specified path is a directory, load schemas from each file, otherwise just load schemas from that path
@@ -124,7 +130,7 @@ namespace Cvent.SchemaToPoco.Core
             var generatedCode = GenerateHelper();
 
             // Create directory to generate files
-            if (!_configuration.Verbose)
+            if (!_configuration.Verbose && _configuration.GenerateNamespaceDirectories)
             {
                 IoUtils.CreateDirectoryFromNamespace(_configuration.OutputDirectory, _configuration.Namespace);
             }
@@ -133,7 +139,7 @@ namespace Cvent.SchemaToPoco.Core
             {
                 if (!_configuration.Verbose)
                 {
-                    string saveLoc = Path.Combine(_configuration.OutputDirectory, entry.Key.Namespace.Replace('.', Path.DirectorySeparatorChar), entry.Key.Schema.Title + ".cs");
+                    string saveLoc = Path.Combine(_configuration.OutputDirectory, _configuration.GenerateNamespaceDirectories ? entry.Key.Namespace.Replace('.', Path.DirectorySeparatorChar) : "", entry.Key.Schema.Title + ".cs");
                     IoUtils.GenerateFile(entry.Value, saveLoc);
                     Console.WriteLine("Wrote " + saveLoc);
                 }

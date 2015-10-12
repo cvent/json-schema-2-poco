@@ -62,7 +62,8 @@ namespace Cvent.SchemaToPoco.Console
                     "a=|attribute=", "Attribute type (1 - Default DataAnnotations, 2 - JSON.net compatible attributes",
                     fn => settings.Config.AttributeType = (AttributeType) Enum.Parse(typeof(AttributeType), fn)
                 },
-                {"?|help", "Show this help message", h => settings.ShowHelp = !string.IsNullOrWhiteSpace(h)}
+                {"?|help", "Show this help message", h => settings.ShowHelp = !string.IsNullOrWhiteSpace(h)},
+                {"nd|nonamespacedirectories", "Don't generate namespace directories", nd => settings.Config.GenerateNamespaceDirectories = string.IsNullOrWhiteSpace(nd) }
             };
 
             _options.Parse(arguements);

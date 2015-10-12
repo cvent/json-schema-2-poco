@@ -86,6 +86,11 @@ Default: `<exe location>\generated`
 ```
 Prints out generated code without generating files
 
+```
+-nd
+```
+Doesn't create namespace directories and writes directly to output
+
 ## Usage (Library)
 
 [Download the latest DLL](https://github.com/cvent/json-schema-2-poco/releases), and add it to your project as a reference.
