@@ -51,6 +51,12 @@ namespace Cvent.SchemaToPoco.Core
             {
                 ConfigureLogging();
 
+                //Base output directory is always needed regardless of namespace directories generation option
+                if (!Directory.Exists(_configuration.OutputDirectory))
+                {
+                    Directory.CreateDirectory(_configuration.OutputDirectory);
+                }
+
                 // Load schemas given a json file or directory
                 LoadSchemas();
 
