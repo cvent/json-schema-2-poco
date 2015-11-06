@@ -180,12 +180,27 @@ namespace Cvent.SchemaToPoco.Core
             } 
 
             // Set up schema and wrapper to return
-            JsonSchema parsed;
+            JsonSchema parsed = null;
 
             RemoveDuplicateSchemas();
+
+            // work around the situation where we don't have a schema in our list of schemas,
+            // but the resolver itself has already loaded that schema because it's a sub-schema
+            // of a schema we've already loaded. In this case, find the already-resolved
+            // schema and add that to our list of schemas
+            foreach (var schema in _resolver.LoadedSchemas)
+            {
+                if (schema.Id != null &&  schema.Id.Equals(curr.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                {
+                    parsed = schema;
+                }
+            }
             try
             {
-                parsed = JsonSchema.Parse(data, _resolver);
+                if (parsed == null)
+                {
+                    parsed = JsonSchema.Parse(data, _resolver);
+                }
             }
             catch (Exception)
             {
@@ -287,6 +302,25 @@ namespace Cvent.SchemaToPoco.Core
                 {
                     var matched = pattern.Match(lines[i]);
                     var matchedPath = matched.Groups[2].Value;
+                    if (matchedPath.StartsWith("#"))
+                    {
+                        //JSON pointer syntax isn't handled properly, but by creating our .json files with a convention
+                        //that the last part of the pointer path matches the ID of the schema being declared in the same file,
+                        //the reference can be fixed up by changing it to that ID (while still allowing the JSON pointer to work for Java)
+                        string[] parts = matchedPath.Split('/');
+                        string modifiedPath = parts[parts.Length - 1];
+                        if (ids.Contains(modifiedPath))
+                        {
+                            lines[i] = matched.Groups[1].Value + modifiedPath + matched.Groups[3].Value + ",";
+                            continue;
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException(String.Format(
+                                "'{0}' appears to be a JSON pointer, which is not directly supported. Attempted to use the last part as a local ID reference but '{1}' was not found in this document.",
+                                matchedPath, modifiedPath));
+                        }
+                    }
                     // only modify the reference if it's not referencing an ID in this file
                     if (!ids.Contains(matchedPath))
                     {
