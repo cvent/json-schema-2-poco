@@ -2,22 +2,23 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Cvent.SchemaToPoco.Core;
-using Cvent.SchemaToPoco.Core.Types;
-using Cvent.SchemaToPoco.Types;
+using Cvent.SchemaToPoPHPo.Core;
+using Cvent.SchemaToPoPHPo.Core.Types;
+using Cvent.SchemaToPoPHPo.Types;
 using NDesk.Options;
 
-namespace Cvent.SchemaToPoco.Console
+namespace Cvent.SchemaToPoPHPo.Console
 {
     /// <summary>
     ///     Main executor class for the CLI.
     /// </summary>
-    public class JsonSchemaToPocoCLExecutor
+    // ReSharper disable once InconsistentNaming
+    public class JsonSchemaToPoPHPoCLExecutor
     {
         /// <summary>
         ///     Main controller.
         /// </summary>
-        private readonly JsonSchemaToPoco _controller;
+        private readonly JsonSchemaToPoPHPo _controller;
 
         /// <summary>
         ///     Arguments from command line, raw format.
@@ -33,11 +34,11 @@ namespace Cvent.SchemaToPoco.Console
         ///     Constructor taking in command line arguments.
         /// </summary>
         /// <param name="args">Command line arguments.</param>
-        public JsonSchemaToPocoCLExecutor(IEnumerable<string> args)
+        public JsonSchemaToPoPHPoCLExecutor(IEnumerable<string> args)
         {
             _settings = ConfigureCommandLineOptions(args);
             
-            _controller = new JsonSchemaToPoco(_settings.Config);
+            _controller = new JsonSchemaToPoPHPo(_settings.Config);
         }
 
         /// <summary>
@@ -51,10 +52,9 @@ namespace Cvent.SchemaToPoco.Console
 
             _options = new OptionSet
             {
-                {"n=|namespace=", "Namespace contaning all of the generated classes", ns => settings.Config.Namespace = ns},
+                {"n=|namespace=", "Namespace containing all of the generated classes", ns => settings.Config.Namespace = ns},
                 {"s=|schema=", "File path to the schema file", s => settings.Config.JsonSchemaFileLocation = s},
                 {"o=|output=", "Directory to save files", fn => settings.Config.OutputDirectory = fn},
-                {"l=|language=","Language to export (csharp or php)",  ln  => settings.Config.LanguageExportType = (LanguageExportType)Enum.Parse(typeof(LanguageExportType),ln,true)},
                 {
                     "v|verbose", "Print out files in console without generating",
                     v => settings.Config.Verbose = !string.IsNullOrWhiteSpace(v)
@@ -97,7 +97,7 @@ namespace Cvent.SchemaToPoco.Console
         /// <returns>An exit code.</returns>
         public static Int32 Main(string[] args)
         {
-            return new JsonSchemaToPocoCLExecutor(args).Execute();
+            return new JsonSchemaToPoPHPoCLExecutor(args).Execute();
         }
     }
 }

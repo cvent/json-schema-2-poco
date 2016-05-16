@@ -41,6 +41,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NLog.3.2.0.0\lib\net40\NLog.dll</HintPath>
     </Reference>
+    <Reference Include="PhpNetCore.CodeDom, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0a8e8c4c76728c71, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\code\Phalanger\Deployment\Debug\PhpNetCore.CodeDom.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -53,9 +57,16 @@
   <ItemGroup>
     <Compile Include="CodeToLanguage\CodeCompileUnitToCSharp.cs" />
     <Compile Include="CodeToLanguage\CodeCompileUnitToLanguageBase.cs" />
+    <Compile Include="CodeToLanguage\CodeCompileUnitToPHP.cs" />
     <Compile Include="CodeToLanguage\CodeCompileUnitToVisualBasic.cs" />
+    <Compile Include="CodeToLanguage\PhpCodeDomProvider.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CodeToLanguage\PhpCodeGenerator.cs" />
     <Compile Include="Types\ArrayType.cs" />
     <Compile Include="Types\AttributeType.cs" />
+    <Compile Include="Types\EnumExtensions.cs" />
+    <Compile Include="Types\LanguageExportType.cs" />
     <Compile Include="Types\ExitCodes.cs" />
     <Compile Include="JsonSchemaToCodeUnit.cs" />
     <Compile Include="JsonSchemaToPoco.cs" />
