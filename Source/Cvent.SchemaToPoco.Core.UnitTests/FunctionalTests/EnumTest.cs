@@ -21,35 +21,25 @@ namespace Cvent.SchemaToPoco.Core.UnitTests.FunctionalTests
 {
     using System;
     using generated;
+    
+    
     public enum Foo
-        {
-
-            One,
-
-            _2two2,
-
-            Three__third_,
-        }
-
+    {
+        
+        One,
+        
+        _2two2,
+        
+        Three__third_,
+    }
+    
     public class DefaultClassName
     {
-        private Foo _foo;
-
-
-        public virtual Foo Foo
-        {
-            get
-            {
-                return _foo;
-            }
-            set
-            {
-                _foo = value;
-            }
-        }
-
+        
+        public Foo Foo { get; set; }
     }
-}";
+}
+";
             TestBasicEquals(correctResult, JsonSchemaToPoco.Generate(schema));
         }
     }

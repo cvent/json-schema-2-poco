@@ -48,6 +48,7 @@ namespace Cvent.SchemaToPoco.Core.CodeToLanguage
             });
 
             string output = stringBuilder.ToString().Replace(" { get; set; };\r\n", " { get; set; }\r\n");
+            output = output.Replace("{ get; set; } //;\r\n", "{ get; set; }\r\n");
             return output;
         }
 
