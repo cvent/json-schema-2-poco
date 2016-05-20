@@ -1,6 +1,5 @@
 ﻿using System;
 using System.CodeDom.Compiler;
-using PHP.Core.CodeDom;
 
 namespace Cvent.SchemaToPoco.Core.CodeToLanguage
 {
