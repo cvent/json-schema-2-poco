@@ -9,7 +9,7 @@ namespace Cvent.SchemaToPoco.Core.CodeToLanguage
     /// <summary>
     ///     Controller for converting a CodeCompileUnit to code given a code provider.
     /// </summary>
-    public class CodeCompileUnitToLanguageBase
+    public abstract class CodeCompileUnitToLanguageBase
     {
         /// <summary>
         ///     Constant represented a tab.
@@ -48,7 +48,13 @@ namespace Cvent.SchemaToPoco.Core.CodeToLanguage
             });
 
             string output = stringBuilder.ToString().Replace(" { get; set; };\r\n", " { get; set; }\r\n");
+            output = output.Replace("{ get; set; } //;\r\n", "{ get; set; }\r\n");
             return output;
         }
+
+        /// <summary>
+        ///     Main executor function, must be implemented in base classes;
+        /// </summary>
+        public abstract string Execute();
     }
 }

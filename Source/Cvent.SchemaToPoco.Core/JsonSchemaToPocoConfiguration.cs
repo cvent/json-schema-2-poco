@@ -43,5 +43,10 @@ namespace Cvent.SchemaToPoco.Core
         ///     Type of validation attribute to use.
         /// </summary>
         public AttributeType AttributeType { get; set; }
+
+        /// <summary>
+        ///     Language we are exporting to (csharp, php)
+        /// </summary>
+        public LanguageExportType LanguageExportType {get; set;}
     }
 }
