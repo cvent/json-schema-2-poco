@@ -66,6 +66,12 @@ namespace Cvent.SchemaToPoco.Console
                 {"?|help", "Show this help message", h => settings.ShowHelp = !string.IsNullOrWhiteSpace(h)}
             };
 
+            //if the language parameter was not set, default it to csharp.
+            if (settings.Config.LanguageExportType == 0)
+            {
+                settings.Config.LanguageExportType = LanguageExportType.CSharp;
+            }
+
             _options.Parse(arguements);
 
             return settings;
