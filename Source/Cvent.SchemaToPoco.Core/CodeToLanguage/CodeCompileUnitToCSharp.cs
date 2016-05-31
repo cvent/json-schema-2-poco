@@ -16,7 +16,7 @@ namespace Cvent.SchemaToPoco.Core.CodeToLanguage
         ///     Main executor function.
         /// </summary>
         /// <returns>A string of generated C# code.</returns>
-        public string Execute()
+        public override string Execute()
         {
             using (var codeProvider = new CSharpCodeProvider())
             {

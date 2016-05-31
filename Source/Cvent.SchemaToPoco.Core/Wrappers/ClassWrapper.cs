@@ -1,4 +1,6 @@
-﻿using System.CodeDom;
+﻿using Newtonsoft.Json.Schema;
+using System;
+using System.CodeDom;
 
 namespace Cvent.SchemaToPoco.Core.Wrappers
 {
@@ -32,9 +34,10 @@ namespace Cvent.SchemaToPoco.Core.Wrappers
         /// </summary>
         /// <param name="property">The property name.</param>
         /// <param name="type">The type of the property.</param>
-        /// <param name="value">The value to initialize with.</param>
-        public void AddDefault(string property, CodeTypeReference type, string value)
+        /// <param name="schema">The schema containing the default value to initialize with.</param>
+        public void AddDefault(string property, CodeTypeReference type, JsonSchema schema)
         {
+            string value = schema.Default.ToString();
             // Create constructor if doesn't already exist
             if (Constructor == null)
             {
@@ -48,8 +51,18 @@ namespace Cvent.SchemaToPoco.Core.Wrappers
             double m;
             bool b;
 
+            // Check for Enum first since it can be detected without trying to parse
+            if (schema.Enum != null)
+            {
+                // if this is an enum type (based on suffix of Enum in the type name),
+                // then parse it like: (CustomEnum) Enum.Parse(typeOf
+                exp = new CodeCastExpression(type,
+                    new CodeMethodInvokeExpression(
+                        new CodeTypeReferenceExpression("System.Enum"),
+                        "Parse", new CodeTypeOfExpression(type), new CodePrimitiveExpression(value), new CodePrimitiveExpression(true)));
+            }
             // Check for int
-            if (int.TryParse(value, out n))
+            else if (int.TryParse(value, out n))
             {
                 exp = new CodePrimitiveExpression(n);
             }
@@ -62,7 +75,7 @@ namespace Cvent.SchemaToPoco.Core.Wrappers
             else if (bool.TryParse(value, out b))
             {
                 exp = new CodePrimitiveExpression(b);
-            } 
+            }
             // Check for {}
             else if (value.Equals("{}"))
             {
