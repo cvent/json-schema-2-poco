@@ -2,17 +2,30 @@
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace Cvent.SchemaToPoco.Core.CodeToLanguage
 {
     public class PhpCodeGenerator : ICodeGenerator
     {
-        private IndentedTextWriter _output = null;
+        private IndentedTextWriter _output;
         private CodeGeneratorOptions _options;
+        private readonly Dictionary<string,string> _typeMapping = new Dictionary<string, string>();
 
+        public PhpCodeGenerator()
+        {
+            _typeMapping.Add("system.boolean","boolean");
+            _typeMapping.Add("system.double", "float");
+            _typeMapping.Add("system.int16", "integer");
+            _typeMapping.Add("system.int32", "integer");
+            _typeMapping.Add("system.int64", "integer");
+            _typeMapping.Add("system.string", "string");
+            _typeMapping.Add("list<string>", "string[]");
+            _typeMapping.Add("list<int>", "int[]");
+            _typeMapping.Add("list<double>", "float[]");
+
+        }
         public bool IsValidIdentifier(string value)
         {
             throw new NotImplementedException();
@@ -89,11 +102,6 @@ namespace Cvent.SchemaToPoco.Core.CodeToLanguage
         {
             foreach (CodeTypeDeclaration type in ns.Types)
             {
-                if (type.Name == "ImportRequestSchema")
-                {
-                    int y = 0;
-                }
-
                 GenerateClass(type);
                 GenerateEnum(type);
                 _output.WriteLineNoTabs(string.Empty);
@@ -104,7 +112,8 @@ namespace Cvent.SchemaToPoco.Core.CodeToLanguage
         {
             if (type.IsEnum)
             {
-                _output.Write("abstract class {0} ", type.Name);
+                _output.WriteLine("require_once (dirname(__FILE__) .  '/../../../../../includes/Enum.php');");
+                _output.Write("class {0} extends Enum ", type.Name);
                 OutputStartingBrace();
 
                 _output.Indent++;
@@ -134,22 +143,45 @@ namespace Cvent.SchemaToPoco.Core.CodeToLanguage
 
         private void GeneratePhpMembers(CodeTypeDeclaration type)
         {
-            int enumCounter = 1;
             foreach (CodeTypeMember member in type.Members)
             {
                 if(member.Name == ".ctor")
                     continue;
-                //if((member.Attributes & MemberAttributes.Public) == MemberAttributes.Public)
                 if (type.IsEnum)
                 {
-                    _output.WriteLine("const {0} = {1};",member.Name,enumCounter);
-                    enumCounter++;
+                    _output.WriteLine("const {0} = '{1}';", member.Name, member.Name);
                 }
                 else
                 {
-                    _output.WriteLine("public ${0};", member.Name.Replace(" { get; set; } //", string.Empty));
+                    if (member is CodeMemberField)
+                    {
+
+                        var cmf = member as CodeMemberField;
+                        var declaringType = cmf.Type.BaseType;
+                        var memberName = member.Name.Replace(" { get; set; } //", string.Empty);
+                        var phpJsonNDocAttribute = GetPhpType(declaringType);
+                        _output.WriteLine("/**");
+                        _output.WriteLine(" * @var {0}", phpJsonNDocAttribute);
+                        _output.WriteLine(" */");
+                        _output.WriteLine("public ${0};", memberName);
+                    }
                 }
             }
+        }
+
+        private string GetPhpType(string declaringType)
+        {
+            string phpType = declaringType;
+            if (_typeMapping.ContainsKey(declaringType.ToLower()))
+            {
+                phpType = _typeMapping[declaringType.ToLower()];
+            }
+            else if (phpType.StartsWith("List<"))
+            {
+                phpType = phpType.Replace("List<", "").Replace(">", "[]");
+            }
+            Debug.WriteLine("Declaring Type: " + declaringType + " new type: "  + phpType);
+            return phpType;
         }
 
         private void OutputStartingBrace()
