@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cvent.SchemaToPoco.Core.Util;
+using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -113,7 +114,7 @@ namespace Cvent.SchemaToPoco.Core.CodeToLanguage
             if (type.IsEnum)
             {
                 _output.WriteLine("require_once (dirname(__FILE__) .  '/../../../../../includes/Enum.php');");
-                _output.Write("class {0} extends Enum ", type.Name);
+                _output.Write("class {0} extends Enum ", StringUtils.LowerFirst(type.Name));
                 OutputStartingBrace();
 
                 _output.Indent++;
@@ -129,7 +130,7 @@ namespace Cvent.SchemaToPoco.Core.CodeToLanguage
         {
             if (type.IsClass)
             {
-                _output.Write("class {0} ", type.Name);
+                _output.Write("class {0} ", StringUtils.LowerFirst(type.Name));
                 OutputStartingBrace();
 
                 _output.Indent++;
@@ -161,9 +162,9 @@ namespace Cvent.SchemaToPoco.Core.CodeToLanguage
                         var memberName = member.Name.Replace(" { get; set; } //", string.Empty);
                         var phpJsonNDocAttribute = GetPhpType(declaringType);
                         _output.WriteLine("/**");
-                        _output.WriteLine(" * @var {0}", phpJsonNDocAttribute);
+                        _output.WriteLine(" * @var {0}", StringUtils.LowerFirst(phpJsonNDocAttribute));
                         _output.WriteLine(" */");
-                        _output.WriteLine("public ${0};", memberName);
+                        _output.WriteLine("public ${0};", StringUtils.LowerFirst(memberName));
                     }
                 }
             }
@@ -225,5 +226,7 @@ namespace Cvent.SchemaToPoco.Core.CodeToLanguage
         {
             throw new NotImplementedException();
         }
+
+
     }
 }

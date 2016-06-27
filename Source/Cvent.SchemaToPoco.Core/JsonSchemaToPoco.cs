@@ -136,7 +136,15 @@ namespace Cvent.SchemaToPoco.Core
                 if (!_configuration.Verbose)
                 {
                     string saveLoc = Path.Combine(_configuration.OutputDirectory, entry.Key.Namespace.Replace('.', Path.DirectorySeparatorChar), entry.Key.Schema.Title + fileExtension);
-                    IoUtils.GenerateFile(entry.Value, saveLoc);
+                    if (fileExtension.EndsWith("php"))
+                    {
+                        saveLoc = Path.Combine(_configuration.OutputDirectory, entry.Key.Namespace.Replace('.', Path.DirectorySeparatorChar), StringUtils.LowerFirst(entry.Key.Schema.Title) + fileExtension);
+                        IoUtils.GenerateFile(StringUtils.LowerFirst(entry.Value), saveLoc);
+                    }
+                    else
+                    {
+                        IoUtils.GenerateFile(entry.Value, saveLoc);
+                    }
                     Console.WriteLine("Wrote " + saveLoc);
                 }
                 else
