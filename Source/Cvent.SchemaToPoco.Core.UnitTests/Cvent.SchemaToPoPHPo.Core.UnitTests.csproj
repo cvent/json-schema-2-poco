@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B504BB29-7224-4F82-80ED-BDB344ACABEF}</ProjectGuid>
+    <ProjectGuid>{CD63E22C-2545-4BAB-BE8A-BD15B59BF8E0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cvent.SchemaToPoco.Core</RootNamespace>
-    <AssemblyName>Cvent.SchemaToPoco.Core</AssemblyName>
+    <RootNamespace>Cvent.SchemaToPoco.Core.UnitTests</RootNamespace>
+    <AssemblyName>Cvent.SchemaToPoco.Core.UnitTests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -33,16 +33,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NLog, Version=3.2.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NLog.3.2.0.0\lib\net40\NLog.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.2.1\lib\net40\nunit.framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -51,42 +49,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CodeToLanguage\CodeCompileUnitToCSharp.cs" />
-    <Compile Include="CodeToLanguage\CodeCompileUnitToLanguageBase.cs" />
-    <Compile Include="CodeToLanguage\CodeCompileUnitToPHP.cs" />
-    <Compile Include="CodeToLanguage\CodeCompileUnitToVisualBasic.cs" />
-    <Compile Include="CodeToLanguage\PhpCodeDomProvider.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="CodeToLanguage\PhpCodeGenerator.cs" />
-    <Compile Include="Types\ArrayType.cs" />
-    <Compile Include="Types\AttributeType.cs" />
-    <Compile Include="Types\EnumExtensions.cs" />
-    <Compile Include="Types\LanguageExportType.cs" />
-    <Compile Include="Types\ExitCodes.cs" />
-    <Compile Include="JsonSchemaToCodeUnit.cs" />
-    <Compile Include="JsonSchemaToPoco.cs" />
-    <Compile Include="JsonSchemaToPocoConfiguration.cs" />
+    <Compile Include="FunctionalTests\BaseTest.cs" />
+    <Compile Include="FunctionalTests\DefaultTest.cs" />
+    <Compile Include="FunctionalTests\DescriptionTest.cs" />
+    <Compile Include="FunctionalTests\EnumTest.cs" />
+    <Compile Include="FunctionalTests\ExclusiveMinMaxTest.cs" />
+    <Compile Include="FunctionalTests\ItemTest.cs" />
+    <Compile Include="FunctionalTests\MinMaxItems.cs" />
+    <Compile Include="FunctionalTests\MinMaxLengthTest.cs" />
+    <Compile Include="FunctionalTests\MinMaxTest.cs" />
+    <Compile Include="FunctionalTests\PatternTest.cs" />
+    <Compile Include="FunctionalTests\PropertyTest.cs" />
+    <Compile Include="FunctionalTests\RequiredTest.cs" />
+    <Compile Include="FunctionalTests\TitleTest.cs" />
+    <Compile Include="FunctionalTests\TypeTest.cs" />
+    <Compile Include="FunctionalTests\UniqueItemsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Wrappers\BaseWrapper.cs" />
-    <Compile Include="Wrappers\ClassWrapper.cs" />
-    <Compile Include="Wrappers\EnumWrapper.cs" />
-    <Compile Include="Wrappers\JsonSchemaWrapper.cs" />
-    <Compile Include="Wrappers\NamespaceWrapper.cs" />
-    <Compile Include="Wrappers\PropertyWrapper.cs" />
-    <Compile Include="Types\TypeBuilderHelper.cs" />
-    <Compile Include="Util\IOUtils.cs" />
-    <Compile Include="JsonSchemaResolver.cs" />
-    <Compile Include="Util\JsonSchemaUtils.cs" />
-    <Compile Include="Util\StringUtils.cs" />
-    <Compile Include="Util\TypeUtils.cs" />
-    <Compile Include="ValidationAttributes\MaxValueAttribute.cs" />
-    <Compile Include="ValidationAttributes\MinValueAttribute.cs" />
+    <Compile Include="TestUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cvent.SchemaToPoco.Core\Cvent.SchemaToPoPHPo.Core.csproj">
+      <Project>{b504bb29-7224-4f82-80ed-bdb344acabef}</Project>
+      <Name>Cvent.SchemaToPoPHPo.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -23,6 +23,7 @@ namespace Cvent.SchemaToPoco.Core
         /// </summary>
         private Logger _log;
 
+
         /// <summary>
         ///     Configuration.
         /// </summary>
@@ -122,6 +123,7 @@ namespace Cvent.SchemaToPoco.Core
         private void Generate()
         {
             var generatedCode = GenerateHelper();
+            var fileExtension = GetFileExtension();
 
             // Create directory to generate files
             if (!_configuration.Verbose)
@@ -133,8 +135,16 @@ namespace Cvent.SchemaToPoco.Core
             {
                 if (!_configuration.Verbose)
                 {
-                    string saveLoc = Path.Combine(_configuration.OutputDirectory, entry.Key.Namespace.Replace('.', Path.DirectorySeparatorChar), entry.Key.Schema.Title + ".cs");
-                    IoUtils.GenerateFile(entry.Value, saveLoc);
+                    string saveLoc = Path.Combine(_configuration.OutputDirectory, entry.Key.Namespace.Replace('.', Path.DirectorySeparatorChar), entry.Key.Schema.Title + fileExtension);
+                    if (fileExtension.EndsWith("php"))
+                    {
+                        saveLoc = Path.Combine(_configuration.OutputDirectory, entry.Key.Namespace.Replace('.', Path.DirectorySeparatorChar), StringUtils.LowerFirst(entry.Key.Schema.Title) + fileExtension);
+                        IoUtils.GenerateFile(StringUtils.LowerFirst(entry.Value), saveLoc);
+                    }
+                    else
+                    {
+                        IoUtils.GenerateFile(entry.Value, saveLoc);
+                    }
                     Console.WriteLine("Wrote " + saveLoc);
                 }
                 else
@@ -142,6 +152,11 @@ namespace Cvent.SchemaToPoco.Core
                     Console.WriteLine(entry.Value);
                 }
             }
+        }
+
+        private string GetFileExtension()
+        {
+            return _configuration.LanguageExportType.GetDescription();
         }
 
         /// <summary>
@@ -158,13 +173,24 @@ namespace Cvent.SchemaToPoco.Core
                 {
                     var jsonSchemaToCodeUnit = new JsonSchemaToCodeUnit(s, s.Namespace, _configuration.AttributeType);
                     CodeCompileUnit codeUnit = jsonSchemaToCodeUnit.Execute();
-                    var csharpGenerator = new CodeCompileUnitToCSharp(codeUnit);
-
-                    generatedCode.Add(s, csharpGenerator.Execute());
+                    var generator = GetCodeCompileUnit(codeUnit);
+                    generatedCode.Add(s, generator.Execute());
                 }
             }
 
             return generatedCode;
+        }
+
+        private CodeCompileUnitToLanguageBase GetCodeCompileUnit(CodeCompileUnit codeUnit)
+        {
+            CodeCompileUnitToLanguageBase returnValue;
+            if(_configuration.LanguageExportType == LanguageExportType.Php)   
+                returnValue = new CodeCompileUnitToPHP(codeUnit);
+            else if (_configuration.LanguageExportType == LanguageExportType.CSharp)
+                returnValue = new CodeCompileUnitToCSharp(codeUnit);
+            else
+                throw new Exception("Unknown language export"); 
+            return returnValue;
         }
 
         /// <summary>

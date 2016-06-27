@@ -54,6 +54,7 @@ namespace Cvent.SchemaToPoco.Console
                 {"n=|namespace=", "Namespace contaning all of the generated classes", ns => settings.Config.Namespace = ns},
                 {"s=|schema=", "File path to the schema file", s => settings.Config.JsonSchemaFileLocation = s},
                 {"o=|output=", "Directory to save files", fn => settings.Config.OutputDirectory = fn},
+                {"l=|language=","Language to export (csharp or php)",  ln  => settings.Config.LanguageExportType = (LanguageExportType)Enum.Parse(typeof(LanguageExportType),ln,true)},
                 {
                     "v|verbose", "Print out files in console without generating",
                     v => settings.Config.Verbose = !string.IsNullOrWhiteSpace(v)
@@ -64,6 +65,12 @@ namespace Cvent.SchemaToPoco.Console
                 },
                 {"?|help", "Show this help message", h => settings.ShowHelp = !string.IsNullOrWhiteSpace(h)}
             };
+
+            //if the language parameter was not set, default it to csharp.
+            if (settings.Config.LanguageExportType == 0)
+            {
+                settings.Config.LanguageExportType = LanguageExportType.CSharp;
+            }
 
             _options.Parse(arguements);
 

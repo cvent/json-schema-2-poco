@@ -13,7 +13,7 @@ namespace Cvent.SchemaToPoco.Core.Util
         private static readonly Dictionary<string, string> Primitives = new Dictionary<string, string>
         {
             {"String", "System.String"},
-            {"Float", "System.Single"},
+            {"Float", "System.Double"},
             {"Integer", "System.Int32"},
             {"Boolean", "System.Boolean"},
             {"Object", "System.Object"}

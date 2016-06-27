@@ -20,23 +20,26 @@ namespace Cvent.SchemaToPoco.Core.UnitTests.FunctionalTests
             const string correctResult = @"namespace generated
 {
     using System;
-
-
+    using generated;
+    
+    
     public enum Foo
     {
-
+        
         One,
-
+        
         _2two2,
-
+        
         Three__third_,
     }
-
+    
     public class DefaultClassName
     {
+        
+        public Foo Foo { get; set; }
     }
-}";
-
+}
+";
             TestBasicEquals(correctResult, JsonSchemaToPoco.Generate(schema));
         }
     }

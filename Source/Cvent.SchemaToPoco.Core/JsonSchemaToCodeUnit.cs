@@ -102,8 +102,10 @@ namespace Cvent.SchemaToPoco.Core
                         schema.Description = Regex.Unescape(schema.Description);
                     }
 
+                    Type type;
+                    string propertyName = i.Key.Capitalize();
+
                     // If it is an enum
-                    var propertyName = i.Key.Capitalize();
                     if (schema.Enum != null)
                     {
                         var enumField = new CodeTypeDeclaration(propertyName);
@@ -122,60 +124,51 @@ namespace Cvent.SchemaToPoco.Core
 
                         // Add to namespace
                         nsWrap.AddClass(enumWrap.Property);
+
+                        // note type for property declaration
+                        type = new TypeBuilderHelper(_codeNamespace).GetCustomType(propertyName, true);
                     }
                     else
                     {
                         // WARNING: This assumes the namespace of the property is the same as the parent.
                         // This should not be a problem since imports are handled for all dependencies at the beginning.
-                        Type type = JsonSchemaUtils.GetType(schema, _codeNamespace);
-                        bool isCustomType = type.Namespace != null && type.Namespace.Equals(_codeNamespace);
-                        string strType = String.Empty;
+                        type = JsonSchemaUtils.GetType(schema, _codeNamespace);
+                    }
 
-                        // Add imports
-                        nsWrap.AddImport(type.Namespace);
-                        nsWrap.AddImportsFromSchema(schema);
+                    bool isCustomType = type.Namespace != null && type.Namespace.Equals(_codeNamespace);
+                    string strType = String.Empty;
 
-                        // Get the property type
-                        if (isCustomType)
-                        {
-                            strType = JsonSchemaUtils.IsArray(schema) ? string.Format("{0}<{1}>", JsonSchemaUtils.GetArrayType(schema), type.Name) : type.Name;
-                        }
-                        else if (JsonSchemaUtils.IsArray(schema))
-                        {
-                            strType = string.Format("{0}<{1}>", JsonSchemaUtils.GetArrayType(schema),
-                                new CSharpCodeProvider().GetTypeOutput(new CodeTypeReference(type)));
-                        }
+                    // Add imports
+                    nsWrap.AddImport(type.Namespace);
+                    nsWrap.AddImportsFromSchema(schema);
 
-                        //var field = new CodeMemberField
-                        //{
-                        //    Attributes = MemberAttributes.Private,
-                        //    Name = "_" + i.Key,
-                        //    Type =
-                        //        TypeUtils.IsPrimitive(type) && !JsonSchemaUtils.IsArray(schema)
-                        //            ? new CodeTypeReference(type)
-                        //            : new CodeTypeReference(strType)
-                        //};
-
-
-                        //clWrap.Property.Members.Add(field);
-
-                        var property = CreateProperty(propertyName, TypeUtils.IsPrimitive(type) && !JsonSchemaUtils.IsArray(schema)
+                    // Get the property type
+                    if (isCustomType)
+                    {
+                        strType = JsonSchemaUtils.IsArray(schema) ? string.Format("{0}<{1}>", JsonSchemaUtils.GetArrayType(schema), type.Name) : type.Name;
+                    }
+                    else if (JsonSchemaUtils.IsArray(schema))
+                    {
+                        strType = string.Format("{0}<{1}>", JsonSchemaUtils.GetArrayType(schema),
+                            new CSharpCodeProvider().GetTypeOutput(new CodeTypeReference(type)));
+                    }
+                    
+                    var property = CreateProperty(propertyName, TypeUtils.IsPrimitive(type) && !JsonSchemaUtils.IsArray(schema)
                                     ? new CodeTypeReference(type)
                                     : new CodeTypeReference(strType));
 
-                        var prWrap = new PropertyWrapper(property);
+                    var prWrap = new PropertyWrapper(property);
 
-                        // Add comments and attributes
-                        prWrap.Populate(schema, _attributeType);
+                    // Add comments and attributes
+                    prWrap.Populate(schema, _attributeType);
 
-                        // Add default, if any
-                        if (schema.Default != null)
-                        {
-                            clWrap.AddDefault(propertyName, property.Type, schema.Default.ToString());
-                        }
-
-                        clWrap.Property.Members.Add(property);
+                    // Add default, if any
+                    if (schema.Default != null)
+                    {
+                        clWrap.AddDefault(propertyName, property.Type, schema);
                     }
+
+                    clWrap.Property.Members.Add(property);
                 }
             }
 
@@ -204,7 +197,11 @@ namespace Cvent.SchemaToPoco.Core
                 
             };
 
-            field.Name += " { get; set; }";
+            // adding the autoprop declaration to the field name is a workaround as autoprops
+            // are otherwise unsupported by CodeMemberField. Unfortunately, this adds an
+            // extraneous ; at the end of the line, so the // hides that from the compiler
+            // and crucially hides it from CS2J
+            field.Name += " { get; set; } //";
 
             return field;
         }
